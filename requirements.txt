@@ -1,0 +1,12 @@
+streamlit
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+plotly
+python-dotenv
+ydata_profiling
+scipy
+google-generativeai
+setuptools
