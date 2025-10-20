@@ -1,0 +1,13 @@
+# --- Cache and compilation files ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- System Configuration / IDEs ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
