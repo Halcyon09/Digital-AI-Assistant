@@ -1,13 +1,32 @@
-# --- Cache and compilation files ---
+# --- Compiled Python files ---
 __pycache__/
 *.py[cod]
-*$py.class
+*.pyo
+*.pyd
+*.so
 
-# --- System Configuration / IDEs ---
-.vscode/
-.idea/
+# --- Temporary files ---
+*.log
+*.tmp
 *.swp
-*.swo
-*~
+*.bak
+
+# --- Operating system files and folders ---
 .DS_Store
 Thumbs.db
+
+# --- Editor configuration files ---
+.vs/
+.vscode/
+.idea/
+*.code-workspace
+
+# --- Test files and coverage ---
+htmlcov/
+.coverage
+.tox/
+.cache/
+pytest_cache/
+
+# --- Ignore secret or personal development files ---
+secrets.json

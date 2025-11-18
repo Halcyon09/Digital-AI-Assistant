@@ -1,12 +1,4 @@
-streamlit
-pandas
-numpy
-scikit-learn
-matplotlib
-seaborn
-plotly
-python-dotenv
-ydata_profiling
-scipy
-google-generativeai
-setuptools
+fastapi==0.109.0
+uvicorn[standard]==0.24.0
+python-dotenv==1.0.0
+google-generativeai==0.7.2
