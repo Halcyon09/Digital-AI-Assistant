@@ -2,6 +2,7 @@ import os
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
 import google.generativeai as genai
 
@@ -9,7 +10,7 @@ import google.generativeai as genai
 load_dotenv()
 
 API_KEY = os.getenv("GEMINI_API_KEY")
-MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")  # Modelo actualizado
+MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")  # Modelo anterior que sí funcionaba
 
 if not API_KEY:
     raise Exception("Debes definir GEMINI_API_KEY en tu archivo .env")
@@ -17,45 +18,53 @@ if not API_KEY:
 # Configurar API de Gemini
 genai.configure(api_key=API_KEY)
 
-# Validar modelo disponible
+# Inicializar modelo
 try:
     model = genai.GenerativeModel(MODEL_NAME)
 except Exception:
     raise Exception(
-        f"El modelo '{MODEL_NAME}' no existe o no es compatible. "
-        f"Prueba con: gemini-2.0-flash, gemini-2.0-pro, gemini-1.5-flash."
+        f"Modelo '{MODEL_NAME}' no existe. Usa: gemini-2.0-flash, gemini-2.0-pro."
     )
 
 # FastAPI
-app = FastAPI(title="API IA - Gemini Version Actualizada")
+app = FastAPI(title="API IA - Gemini Versión Estable")
 
+# CORS para permitir que el HTML se conecte
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Modelo de petición
 class ChatRequest(BaseModel):
-    messages: list[dict]  # [{"role": "user", "content": "hola"}]
+    messages: list[dict]
 
+# Modelo de respuesta
 class ChatResponse(BaseModel):
     reply: str
 
+# -----------------------------
+# CHAT BÁSICO
+# -----------------------------
 @app.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest):
-    """
-    Endpoint que envía mensajes a Gemini.
-    Gemini NO usa 'messages' como OpenAI, así que convertimos todo a un prompt.
-    """
     try:
-        # Convertimos la conversación completa a un solo texto
-        conversation_text = ""
+        # Convertir mensajes a texto lineal
+        conversation = ""
 
         for msg in req.messages:
             role = msg.get("role", "user").upper()
             content = msg.get("content", "")
-            conversation_text += f"{role}: {content}\n"
+            conversation += f"{role}: {content}\n"
 
-        # Enviar a Gemini
-        response = model.generate_content(conversation_text)
+        
+        response = model.generate_content(conversation)
 
-        # Verificar si Gemini devolvió texto
         if not hasattr(response, "text"):
-            raise Exception("La API de Gemini no devolvió texto válido.")
+            raise Exception("La API de Gemini no devolvió texto.")
 
         return ChatResponse(reply=response.text)
 
