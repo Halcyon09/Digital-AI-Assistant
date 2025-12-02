@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,7 +9,7 @@ import google.generativeai as genai
 load_dotenv()
 
 API_KEY = os.getenv("GEMINI_API_KEY")
-MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")  # Modelo anterior que sí funcionaba
+MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.0-flash-exp")
 
 if not API_KEY:
     raise Exception("Debes definir GEMINI_API_KEY en tu archivo .env")
@@ -22,7 +22,7 @@ try:
     model = genai.GenerativeModel(MODEL_NAME)
 except Exception:
     raise Exception(
-        f"Modelo '{MODEL_NAME}' no existe. Usa: gemini-2.0-flash, gemini-2.0-pro."
+        f"Modelo '{MODEL_NAME}' no existe. Usa: gemini-2.0-flash-exp, gemini-1.5-pro."
     )
 
 # FastAPI
@@ -51,7 +51,7 @@ class ChatResponse(BaseModel):
 @app.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest):
     try:
-        # Convertir mensajes a texto lineal
+        
         conversation = ""
 
         for msg in req.messages:
@@ -59,7 +59,6 @@ async def chat(req: ChatRequest):
             content = msg.get("content", "")
             conversation += f"{role}: {content}\n"
 
-        
         response = model.generate_content(conversation)
 
         if not hasattr(response, "text"):
@@ -69,3 +68,29 @@ async def chat(req: ChatRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# -----------------------------
+# SUBIR ARCHIVOS
+# -----------------------------
+@app.post("/upload", response_model=ChatResponse)
+async def upload_file(file: UploadFile = File(...)):
+    try:
+        
+        contents = await file.read()
+        
+        
+        uploaded_file = genai.upload_file(path=file.filename, data=contents)
+        
+        
+        response = model.generate_content([
+            "Analiza este archivo y proporciona un resumen detallado de su contenido.",
+            uploaded_file
+        ])
+        
+        if not hasattr(response, "text"):
+            raise Exception("La API de Gemini no devolvió texto.")
+        
+        return ChatResponse(reply=response.text)
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al procesar archivo: {str(e)}")

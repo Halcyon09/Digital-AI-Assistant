@@ -9,6 +9,9 @@ const fileInput = document.getElementById("file-input");
 const fileBtn = document.getElementById("file-btn");
 const sendBtn = document.getElementById("send-btn");
 
+// Variable para almacenar el archivo seleccionado
+let selectedFile = null;
+
 /* Mostrar mensajes en pantalla */
 function addMessage(text, sender) {
     const div = document.createElement("div");
@@ -18,9 +21,17 @@ function addMessage(text, sender) {
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-/* ENVIAR MENSAJE DE TEXTO */
+/* ENVIAR MENSAJE DE TEXTO O ARCHIVO */
 async function sendMessage() {
     const text = input.value.trim();
+    
+    
+    if (selectedFile) {
+        await sendFileWithMessage(text);
+        return;
+    }
+    
+    
     if (!text) return;
     
     addMessage(text, "user");
@@ -50,24 +61,25 @@ async function sendMessage() {
     }
 }
 
-sendBtn.addEventListener("click", sendMessage);
-input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendMessage();
-});
-
-/* SUBIR ARCHIVOS */
-fileBtn.addEventListener("click", () => {
-    fileInput.click();
-});
-
-fileInput.addEventListener("change", async () => {
-    const file = fileInput.files[0];
-    if (!file) return;
+/* ENVIAR ARCHIVO CON MENSAJE */
+async function sendFileWithMessage(message) {
+    if (!selectedFile) return;
     
-    addMessage("📎 Archivo enviado: " + file.name, "user");
+    
+    const userMessage = message 
+        ? `📎 ${selectedFile.name}\n${message}` 
+        : `📎 Archivo enviado: ${selectedFile.name}`;
+    
+    addMessage(userMessage, "user");
+    input.value = "";
     
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", selectedFile);
+    
+    
+    if (message) {
+        formData.append("message", message);
+    }
     
     typingText.style.display = "block";
     
@@ -87,5 +99,43 @@ fileInput.addEventListener("change", async () => {
         addMessage("⚠ Error al procesar archivo.", "bot");
     }
     
+    
+    selectedFile = null;
     fileInput.value = "";
+    updateFileButton();
+}
+
+
+function updateFileButton() {
+    if (selectedFile) {
+        fileBtn.textContent = "✓ " + selectedFile.name.substring(0, 15);
+        fileBtn.style.backgroundColor = "#4CAF50";
+        fileBtn.style.color = "white";
+    } else {
+        fileBtn.textContent = "📎";
+        fileBtn.style.backgroundColor = "";
+        fileBtn.style.color = "";
+    }
+}
+
+sendBtn.addEventListener("click", sendMessage);
+input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendMessage();
+});
+
+/* SELECCIONAR ARCHIVOS */
+fileBtn.addEventListener("click", () => {
+    fileInput.click();
+});
+
+fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (file) {
+        selectedFile = file;
+        updateFileButton();
+        
+       
+        input.focus();
+        input.placeholder = `Escribe qué quieres hacer con ${file.name}...`;
+    }
 });
