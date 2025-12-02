@@ -49,3 +49,12 @@ This project consists of the design and implementation of a digital assistant ba
     ```
 
 5. 🌐 Access the assistant from your browser by opening the `index.html` template located in the project's frontend folder.
+
+>[!NOTE]
+>**Project Members** 🧑🏻‍💻👥
+>- Karen Valeria Camacho Santamaría <br>
+>- Susan Pamela Hidalgo González <br>
+>- Roger Fernando Pereira Sánchez <br>
+>- Cristopher Rodríguez Fernández <br>
+>- Melani Tamar Vargas Arrieta <br>
+***
