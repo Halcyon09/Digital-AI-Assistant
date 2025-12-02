@@ -73,24 +73,36 @@ async def chat(req: ChatRequest):
 # SUBIR ARCHIVOS
 # -----------------------------
 @app.post("/upload", response_model=ChatResponse)
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(
+    file: UploadFile = File(...),
+    message: str | None = None):
     try:
-        
-        contents = await file.read()
-        
-        
-        uploaded_file = genai.upload_file(path=file.filename, data=contents)
-        
-        
+        # 1) Guardar archivo temporal
+        temp_path = f"temp_{file.filename}"
+
+        with open(temp_path, "wb") as f:
+            content = await file.read()
+            f.write(content)
+
+        # 2) Subir archivo a Gemini
+        uploaded = genai.upload_file(temp_path)
+
+        prompt = message if message else "Analiza este archivo y proporciona un resumen detallado del contenido."
+
+        # 3) Generar respuesta del modelo
         response = model.generate_content([
-            "Analiza este archivo y proporciona un resumen detallado de su contenido.",
-            uploaded_file
+            prompt,
+            uploaded
         ])
-        
+
+        # 4) Eliminar archivo temporal
+        os.remove(temp_path)
+
+        # 5) Validar respuesta
         if not hasattr(response, "text"):
             raise Exception("La API de Gemini no devolvió texto.")
-        
+
         return ChatResponse(reply=response.text)
-    
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al procesar archivo: {str(e)}")
