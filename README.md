@@ -36,19 +36,19 @@ This project consists of the design and implementation of a digital assistant ba
    pip install -r requirements.txt
    ```
 
-4. ⚙️ Configure the environment variables in the `.env` file, then activate your virtual environment:
+3. ⚙️ Configure the environment variables in the `.env` file, then activate your virtual environment:
 
    ```bash
    .venv\Scripts\Activate.ps1
    ```
 
-6. ▶️ Run the digital assistant backend:
+4. ▶️ Run the digital assistant backend:
 
    ```bash
    python -m uvicorn app.main:app
    ```
 
-9. 🌐 Access the assistant from your browser by opening the `index.html` template located in the project's frontend folder.
+5. 🌐 Access the assistant from your browser by opening the `index.html` template located in the project's frontend folder.
 
 >[!NOTE]
 >**Project Members** 🧑🏻‍💻👥
