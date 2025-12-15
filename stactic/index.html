@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Digital-AI-Assistant</title>
+
+    <link href="./css/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<body>
+
+    <div class="app-container">
+        <div id="header">🤖 Asistente Inteligente de Productividad Personal</div>
+
+        <div id="chat-wrapper">
+            <div id="chat-container"></div>
+        </div>
+
+        <div id="typing">La IA está escribiendo...</div>
+
+        <div id="input-container">
+            <button id="file-btn">
+                <i class="fa-solid fa-paperclip" style="color: #3a3a3a;"></i>
+            </button>
+            <input id="message-input" type="text" placeholder="Escribe un mensaje..." />
+
+            <input type="file" id="file-input" style="display:none" />
+
+            
+            <button id="send-btn">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="./js/app.js"></script>
+
+</body>
+</html>
